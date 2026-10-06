@@ -8,12 +8,14 @@ def get_me_random_list(n):
     :params: n: Number of elements in the list
     :returns: A list with n elements in random order
     """
-    a_list = list(range(n))
+    ## by adding the 1, n+1 it acts as a starter point, so it doesnt start a 0
+    a_list = list(range(1, n+1))
     random.shuffle(a_list)
     return a_list
 
 
 def sequential_search(a_list, item):
+    start = time.time()
     pos = 0
     found = False
 
@@ -23,10 +25,10 @@ def sequential_search(a_list, item):
         else:
             pos = pos + 1
 
-    return found
-
+    return found, time.time() - start
 
 def ordered_sequential_search(a_list, item):
+    start = time.time()
     pos = 0
     found = False
     stop = False
@@ -39,12 +41,11 @@ def ordered_sequential_search(a_list, item):
             else:
                 pos = pos + 1
 
-    return found
+    return found, time.time() - start
 
-
-def binary_search_iterative(a_list,item):
+def binary_search_iterative(a_list, item):
+    start = time.time()
     first = 0
-
     last = len(a_list) - 1
     found = False
     while first <= last and not found:
@@ -57,37 +58,57 @@ def binary_search_iterative(a_list,item):
             else:
                 first = midpoint + 1
 
-    return found
-    
-    
-def binary_search_recursive(a_list,item):
-    if len(a_list) == 0:
-        return False
-    else:
-        midpoint = len(a_list) // 2
-        if a_list[midpoint] == item:
-            return True
-        else:
-            if item < a_list[midpoint]:
-                return binary_search_recursive(a_list[:midpoint], item)
-            else:
-                return binary_search_recursive(a_list[midpoint + 1:], item)
+    return found, time.time() - start
 
+
+def binary_search_recursive(a_list, item):
+    start = time.time()
+    
+    def _search(lst, target):
+        if len(lst) == 0:
+            return False
+        else:
+            midpoint = len(lst) // 2
+            if lst[midpoint] == target:
+                return True
+            else:
+                if target < lst[midpoint]:
+                    return _search(lst[:midpoint], target)
+                else:
+                    return _search(lst[midpoint + 1:], target)
+                    
+    found = _search(a_list, item)
+    return found, time.time() - start
 
 if __name__ == "__main__":
-    """Main entry point"""
-    the_size = 500
+    list_sizes = [500, 1000, 5000]
+    target = 99999999
 
-    total_time = 0
-    for i in range(100):
-        mylist = get_me_random_list(the_size)
-        # sorting is not needed for sequential search.
-        mylist = sorted(mylist)
+    for size in list_sizes:
+        seq_time = 0.0
+        ord_seq_time = 0.0
+        bin_iter_time = 0.0
+        bin_rec_time = 0.0
 
-        start = time.time()
-        check = binary_search_iterative(mylist, 99999999)
-        time_spent = time.time() - start
-        total_time += time_spent
+        for _ in range(100):
+            mylist = get_me_random_list(size)
 
-    avg_time = total_time / 100
-    print(f"Binary Search Iterative took {avg_time:10.7f} seconds to run, on average for a list of {the_size} elements")
+            _, time_spent = sequential_search(mylist, target)
+            seq_time += time_spent
+
+            mylist.sort()
+
+            _, time_spent = ordered_sequential_search(mylist, target)
+            ord_seq_time += time_spent
+
+            _, time_spent = binary_search_iterative(mylist, target)
+            bin_iter_time += time_spent
+
+            _, time_spent = binary_search_recursive(mylist, target)
+            bin_rec_time += time_spent
+
+        print(f"\n--- Averages for list of {size} elements ---")
+        print(f"Sequential Search took {seq_time / 100:10.7f} seconds to run, on average")
+        print(f"Ordered Sequential Search took {ord_seq_time / 100:10.7f} seconds to run, on average")
+        print(f"Iterative Binary Search took {bin_iter_time / 100:10.7f} seconds to run, on average")
+        print(f"Recursive Binary Search took {bin_rec_time / 100:10.7f} seconds to run, on average") 

@@ -1,3 +1,5 @@
+## Part 1: Search Algorithm
+
 import time
 import random
 
@@ -112,3 +114,9 @@ if __name__ == "__main__":
         print(f"Ordered Sequential Search took {ord_seq_time / 100:10.7f} seconds to run, on average")
         print(f"Iterative Binary Search took {bin_iter_time / 100:10.7f} seconds to run, on average")
         print(f"Recursive Binary Search took {bin_rec_time / 100:10.7f} seconds to run, on average") 
+
+
+## if start = time.time() was inside the repeating loop, 
+## the stopwatch would reset every time the function called itself.
+## keeping the timer on the outside prevents the math from resetting.
+
